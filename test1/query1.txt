@@ -1,0 +1,6 @@
+SELECT * 
+FROM (SELECT grommet_product_categories.id, grommet_product_categories.product_id
+FROM grommet_gifts_categories
+INNER JOIN grommet_product_categories ON grommet_gifts_categories.id=grommet_product_categories.product_category_id
+WHERE grommet_gifts_categories.sub_category="Jewelry") AS catagory_id
+INNER JOIN grommet_products ON catagory_id.product_id=grommet_products.id

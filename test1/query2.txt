@@ -1,0 +1,6 @@
+SELECT * 
+FROM (SELECT grommet_product_to_keyword.product_id
+FROM grommet_product_keywords
+INNER JOIN grommet_product_to_keyword ON grommet_product_keywords.id=grommet_product_to_keyword.keyword_id
+WHERE grommet_product_keywords.keyword="Hair accessor") AS keyword_id
+INNER JOIN grommet_products ON keyword_id.product_id=grommet_products.id
