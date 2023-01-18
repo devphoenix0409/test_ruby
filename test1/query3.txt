@@ -1,13 +1,15 @@
-SELECT *
-FROM (SELECT * 
-FROM (SELECT grommet_product_categories.product_id
-FROM grommet_gifts_categories
-INNER JOIN grommet_product_categories ON grommet_gifts_categories.id=grommet_product_categories.product_category_id
-WHERE grommet_gifts_categories.sub_category="Beauty & Personal Care" OR grommet_gifts_categories.sub_category="Skincare") AS catagory_id
-INNER JOIN grommet_products ON catagory_id.product_id =grommet_products.id) AS A,
-(SELECT * 
-FROM (SELECT grommet_product_to_keyword.product_id
-FROM grommet_product_keywords
-INNER JOIN grommet_product_to_keyword ON grommet_product_keywords.id=grommet_product_to_keyword.keyword_id
-WHERE grommet_product_keywords.keyword="Aromatherapy") AS keyword_id
-INNER JOIN grommet_products ON keyword_id.product_id=grommet_products.id) AS B
+SELECT producer_name, product_name, product_short_description, product_price_min
+FROM grommet_products AS p
+INNER JOIN grommet_product_categories AS c
+ON p.id = c.product_id
+INNER JOIN grommet_gifts_categories AS g
+ON c.product_category_id = g.id
+WHERE (g.sub_category = "Beauty & Personal Care" OR g.sub_category = "Skincare") AND p.is_sold_out = "0"
+UNION
+SELECT producer_name, product_name, product_short_description, product_price_min 
+FROM grommet_products AS p
+INNER JOIN grommet_product_to_keyword AS tk
+ON p.id = tk.product_id
+INNER JOIN grommet_product_keywords AS k
+ON tk.keyword_id = k.id
+WHERE k.keyword = "Aromatherapy" AND p.is_sold_out = "0"
