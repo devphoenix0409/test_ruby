@@ -13,7 +13,7 @@ def get_html_as_string(filename)
   return data
 end
 
-filename = "S18027_2021-08-05_N1.pdf"
+filename = "S17525_2020-03-05_N1.pdf"
 htmlname = "" + filename
 
 htmlname.gsub! 'pdf', 'html'
@@ -68,7 +68,9 @@ PDF::Reader.open(file) do |reader|
   end
 end
 
-if text.include? "$"
-  price = text[/\$.*/].split(' ')[0]
-  puts price
-end
+str = text
+price = str.match(/(\$\d{1,5}\.\d{1,5})/)[0]
+puts price
+
+date = str.match(/(\d{1,2}\/\d{1,2}\/\d{1,4})/)[0]
+puts date
