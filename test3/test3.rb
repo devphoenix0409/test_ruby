@@ -18,16 +18,6 @@ htmlname = "" + filename
 
 htmlname.gsub! 'pdf', 'html'
 
-text = ""
-file = File.expand_path(File.dirname(__FILE__)) + "/" + filename
-
-PDF::Reader.open(file) do |reader|
-  reader.pages.each do |page|
-    text += page.text
-    text += "\n"
-  end
-end
-
 begin
     client = Pdfcrowd::PdfToHtmlClient.new("Cloud", "8436ce68a87168b7408616e29ff19b23")
 
@@ -68,6 +58,15 @@ div_location.each do |container|
   puts location
 end
 
+text = ""
+file = File.expand_path(File.dirname(__FILE__)) + "/" + filename
+
+PDF::Reader.open(file) do |reader|
+  reader.pages.each do |page|
+    text += page.text
+    text += "\n"
+  end
+end
 
 if text.include? "$"
   price = text[/\$.*/].split(' ')[0]
