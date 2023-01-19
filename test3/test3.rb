@@ -1,23 +1,75 @@
 require 'rubygems'
 require 'pdf/reader'
+require 'nokogiri'
+require "pdfcrowd"
 require 'json'
 
-filename = File.expand_path(File.dirname(__FILE__)) + "/17423_2019-07-08_N11.pdf"
+def get_html_as_string(filename)
+  data = ''
+  f = File.open(filename, "r") 
+  f.each_line do |line|
+    data += line
+  end
+  return data
+end
+
+filename = "S18027_2021-08-05_N1.pdf"
+htmlname = "" + filename
+
+htmlname.gsub! 'pdf', 'html'
 
 text = ""
+file = File.expand_path(File.dirname(__FILE__)) + "/" + filename
 
-PDF::Reader.open(filename) do |reader|
+PDF::Reader.open(file) do |reader|
   reader.pages.each do |page|
-    text = page.text
+    text += page.text
+    text += "\n"
   end
 end
 
-myarray = text.split(/\n/, -1)
-name = myarray[3].delete(").,").strip
-address = myarray[11].delete(").,").strip
-date = myarray[13].delete(").,").split(':').last.split
-price = text[/\$.*/].split(' ')[0]
+begin
+    client = Pdfcrowd::PdfToHtmlClient.new("Cloud", "8436ce68a87168b7408616e29ff19b23")
 
-hash = {:petitioner => name, :state => address, :amount => price, :date => date}
+    client.convertFileToFile(File.expand_path(File.dirname(__FILE__)) + "/" + filename, htmlname)
+rescue Pdfcrowd::Error => why
+    STDERR.puts "Pdfcrowd Error: #{why}"
 
-puts JSON.generate(hash)
+    raise
+end
+
+html_content = get_html_as_string htmlname
+
+parsed_data = Nokogiri::HTML.parse(html_content)
+
+div_name = parsed_data.css('div.t.m0.x2.h2.y2')
+
+div_location = parsed_data.css('div.t.m0.x2.h2.y7')
+
+if div_location.length == 0
+  div_location = parsed_data.css('div.t.m0.x2.h2.y5')
+end
+
+if div_location.length == 0
+  div_location = parsed_data.css('div.t.m0.x2.h2.y6')
+end
+
+if div_location.length == 0
+  div_location = parsed_data.css('div.t.m0.x2.h2.y8')
+end
+
+div_name.each do |container|
+  name = container.content
+  puts name
+end
+
+div_location.each do |container|
+  location = container.content
+  puts location
+end
+
+
+if text.include? "$"
+  price = text[/\$.*/].split(' ')[0]
+  puts price
+end
